@@ -32,9 +32,8 @@
 <script>
 // import axios from '../../plugins/axios';
 import * as faceapi from "face-api.js";
-// import ColorThief from "colorthief";
+import ColorThief from "colorthief";
 import { mapState, mapMutations, mapActions, mapGetters } from 'vuex';
-import RecordRTC from "recordrtc";
 import LoadingBar from '../util/LoadingBar.vue';
 
 export default {
@@ -78,70 +77,78 @@ export default {
     },
     startRec() {
       this.$refs.video.srcObject = null;
-      this.captureCamera(camera => {
+      this.captureCamera((camera) => {
         const video = this.$refs["video"];
         video.muted = true;
         video.volume = 0;
         video.srcObject = camera;
-        this.recorder = RecordRTC(camera, {
-          type: "video",
-          mimeType: 'video/webm', // 웹 브라우저에서 가장 호환성 좋은 포맷
-          videoBitsPerSecond: 2500000, // 비트레이트 설정 (2.5Mbps)
-          frameRate: 30 // 프레임 속도 설정
-        });
-        this.recorder.startRecording();
-        this.recorder.camera = camera;
-
+        this.recorder = camera;
       });
-      this.isRecording = true; // 녹화 중 상태로 변경
     },
     captureCamera(callback) {
       navigator.mediaDevices
-      .getUserMedia({
-        video: {
-          width: { ideal: 1280 }, // 원하는 해상도 (가로)
-          height: { ideal: 720 }, // 원하는 해상도 (세로)
-          frameRate: { ideal: 30, max: 60 } // 프레임 속도
-        },
-        audio: true
-      })
-        .then(function(camera) {
+        .getUserMedia({
+          video: true,
+          audio: false,
+        })
+        .then((camera) => {
           callback(camera);
         })
-        .catch(function(error) {
+        .catch((error) => {
           alert("Unable to capture your camera. Please check console logs.");
           console.error(error);
         });
     },
-    stopRec() {
-      return new Promise((resolve) => {
-        try {
-          // 녹화 중인지 확인하고, recorder가 있는 경우에만 stopRecording 호출
-          this.recorder.stopRecording(this.stopRecordingCallback);
-          this.isRecording = false; // 녹화 중 상태 해제
-          
-          this.recorder.stopRecording(() => {
-            this.stopRecordingCallback();
-            resolve(); // 녹화가 끝난 후에 resolve 호출
-          });
-          this.isRecording = false; // 녹화 중 상태 해제
-        } catch (e) {
-          alert('비디오가 로딩중입니다. 잠시만 기다려주세요.');
-        }
-        
-      });
-    },
-    stopRecordingCallback() {
-      const video = this.$refs["video"];
-      if (video) {
-        video.srcObject = null;
-        video.muted = false;
-        video.volume = 1;
+    async captureAndAnalyze() {
+      const canvas = this.$refs.captureCanvas;
+      const video = this.$refs.video;
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      // 얼굴 윤곽 인식
+      const detections = await faceapi.detectAllFaces(
+        canvas,
+        new faceapi.TinyFaceDetectorOptions()
+      );
+      if (detections.length === 0) {
+        alert("얼굴을 인식하지 못했습니다. 다시 시도해주세요.");
+        return;
       }
-      
-      this.recorder.camera.stop();
-      this.recorder.destroy();
-      this.recorder = null;
+
+      // 얼굴 영역 추출
+      const faceBox = detections[0].box;
+      const faceCanvas = document.createElement("canvas");
+      faceCanvas.width = faceBox.width;
+      faceCanvas.height = faceBox.height;
+      faceCanvas
+        .getContext("2d")
+        .drawImage(
+          canvas,
+          faceBox.x,
+          faceBox.y,
+          faceBox.width,
+          faceBox.height,
+          0,
+          0,
+          faceBox.width,
+          faceBox.height
+        );
+
+      // 주요 색상 추출
+      const colorThief = new ColorThief();
+      const dominantColor = colorThief.getColor(faceCanvas);
+      this.personalColor = this.analyzePersonalColor(dominantColor);
+
+      alert(`당신의 퍼스널컬러는 ${this.personalColor}입니다!`);
+    },
+    analyzePersonalColor([r, g, b]) {
+      // 간단한 퍼스널컬러 분석 로직 (예: 톤 기반)
+      if (r > g && r > b) return "Warm (Spring/Autumn)";
+      if (b > r && b > g) return "Cool (Winter/Summer)";
+      return "Neutral";
     },
   },
 };
