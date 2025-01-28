@@ -24,8 +24,8 @@
     </div>
     <!-- 하단 버튼 -->
     <div class="">
-      <button @click="detectFace" class="btn_line">Detect Face</button>
-      <button v-if=imageSrc @click="analyze" class="btn_line">Analyze Personal Color</button>
+      <button @click="detectFace">Detect Face</button>
+      <button v-if=imageSrc @click="analyze">Analyze Personal Color</button>
     </div>
   </div>
 </template>
@@ -49,7 +49,8 @@ export default {
       personalColor: null, // 분석 결과 저장
       image: new Image(),
       imageSrc: '',
-      guideSentence: '얼굴을 정면에 두고, 카메라를 응시해주세요.',
+      guideSentence: '📸 머리카락은 뒤로 남기고, 맨 얼굴로 정면을 바라봐주세요.',
+
     };
   },
   computed: {
@@ -149,9 +150,14 @@ export default {
       }
     },
     async analyze() {
+      //TODO: debounce 적용 필요
       const resultPca = await this.analysisImage();
       console.log(resultPca);
-      alert(`퍼스널 컬러 분석 결과...${resultPca.data.tone}`);
+      //loading바에 아래 문구 추가하면 좋을듯?
+      // '잠시만 기다려주세요...\n' +
+      //                       'AI가 당신의 퍼스널 컬러를 분석하여 \n' +
+      //                       '어울리는 히잡 컬러를 추천해드립니다 ✨
+      alert(`퍼스널 컬러 분석 결과...${resultPca.data.tone} (TODO: 별도 결과 페이지 구성 필요)`);
     },
     extractFace(canvas, faceBox) {
       try {

@@ -1,22 +1,22 @@
 <template>
   <div class="container">
       <div class="box">
-        <p class="title">Let's find my own hijab<br />With My Personal Color</p>
-        <p class="subtitle">write your email address 🤓 </p>
-        <div class="email-input">
+        <p class="title">Your Color, Your Hijab</p>
+        <p class="subtitle">Discover your perfect match with Personal Color 🤓 </p>
+        <!-- <div class="email-input">
         <input
           v-model="email"
           type="text"
           placeholder="Enter your email"
           class="input"
         />
-        <button @click="validateEmail" class="btn">Validate Email</button>
-      </div>
-        <button class="button-text" @click="goToInterviewSelection">START</button>
+        <button @click="validateEmail" class="btn">Validate Email</button> -->
+      <!-- </div> -->
         <div class="image-box">
-          <img style="width:400px; height: 400px;"
-               src="@/assets/otter_ character.png" alt="면접 리허설 이미지" class="image" />
+          <img style="width:600px;"
+               src="@/assets/hijab-personal-color.svg" alt="면접 리허설 이미지" class="image" />
         </div>
+        <button @click="goToInterviewSelection">START</button>
       </div>
 
   </div>
@@ -36,6 +36,7 @@ export default {
     ...mapMutations(['setUserEmail']),
     ...mapActions(['createSession', 'loadInterviewQuestions', 'resetInterview']),
     async goToInterviewSelection() {
+      alert('카메라 약관 작업 필요');
       this.$router.push({ name: 'PcaAnalysis' });
     },
     validateEmail() {
