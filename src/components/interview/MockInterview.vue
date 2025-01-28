@@ -7,7 +7,7 @@
       <div class="content">
         <div class="question-area">
           <p class="nav"><span class="n">{{ "test" }}</span></p>
-          <p class="title">{{ "안내문구 테스트" }}
+          <p class="title">{{ guideSentence }}
             <span @click="generateSpeech" class="speaker -on"></span>
           </p>
           <!-- <p v-else>로딩 중...</p> -->
@@ -16,7 +16,7 @@
         <div class="box">
           <div class="video-area">
             <video autoplay muted ref="video"></video>
-            <img :src="imageSrc" alt="Face Image" />
+            <img v-if=imageSrc :src="imageSrc" alt="Face Image" />
           </div>
         </div>
         <canvas ref="captureCanvas" style="display: none;"></canvas>
@@ -24,9 +24,8 @@
     </div>
     <!-- 하단 버튼 -->
     <div class="">
-      <button class="btn_line" id="btn-start-recording" @click="stopAndstartRec">다시 녹화</button>
       <button @click="detectFace" class="btn_line">Detect Face</button>
-      <button @click="analyze" class="btn_line">Analyze Personal Color</button>
+      <button v-if=imageSrc @click="analyze" class="btn_line">Analyze Personal Color</button>
     </div>
   </div>
 </template>
@@ -50,6 +49,7 @@ export default {
       personalColor: null, // 분석 결과 저장
       image: new Image(),
       imageSrc: '',
+      guideSentence: '얼굴을 정면에 두고, 카메라를 응시해주세요.',
     };
   },
   computed: {
@@ -59,6 +59,7 @@ export default {
   watch: {
   },
   mounted() {
+    this.generateSpeech();
     this.loadFaceApiModels();
     this.startRec();
   },
@@ -181,8 +182,7 @@ export default {
       }
     },
     generateSpeech() {
-      const text = this.currentQuestion.question;
-      this.textToSpeech(text);
+      this.textToSpeech(this.guideSentence);
     },
     textToSpeech(text) {
       const utterance = new SpeechSynthesisUtterance(text);
