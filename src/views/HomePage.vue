@@ -36,7 +36,7 @@ export default {
     ...mapMutations(['setUserEmail']),
     ...mapActions(['createSession', 'loadInterviewQuestions', 'resetInterview']),
     async goToInterviewSelection() {
-      this.$router.push({ name: 'MockInterview' });
+      this.$router.push({ name: 'PcaAnalysis' });
     },
     validateEmail() {
       // 이메일 유효성 검증
