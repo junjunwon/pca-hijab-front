@@ -15,16 +15,18 @@
 
         <div class="box">
           <div class="video-area">
-            <video controls autoplay playsinline ref="video" height="400" width="600"></video>
+            <video autoplay muted ref="video"></video>
+            <img :src="imageSrc" alt="Face Image" />
           </div>
-          <canvas ref="captureCanvas" style="display: none;"></canvas>
         </div>
+        <canvas ref="captureCanvas" style="display: none;"></canvas>
       </div>
     </div>
     <!-- 하단 버튼 -->
     <div class="">
       <button class="btn_line" id="btn-start-recording" @click="stopAndstartRec">다시 녹화</button>
-      <button @click="captureAndAnalyze" class="btn_line">Analyze Personal Color</button>
+      <button @click="detectFace" class="btn_line">Detect Face</button>
+      <button @click="analyze" class="btn_line">Analyze Personal Color</button>
     </div>
   </div>
 </template>
@@ -32,7 +34,7 @@
 <script>
 // import axios from '../../plugins/axios';
 import * as faceapi from "face-api.js";
-import ColorThief from "colorthief";
+// import ColorThief from "colorthief";
 import { mapState, mapMutations, mapActions, mapGetters } from 'vuex';
 import LoadingBar from '../util/LoadingBar.vue';
 
@@ -43,10 +45,11 @@ export default {
   data() {
     return {
       isLoading: false,
-      recorder: null,
       synth: window.speechSynthesis,
       isRecording: false, // 음성 인식 상태 확인
       personalColor: null, // 분석 결과 저장
+      image: new Image(),
+      imageSrc: '',
     };
   },
   computed: {
@@ -60,29 +63,18 @@ export default {
     this.startRec();
   },
   methods: {
-    ...mapMutations(['']),
-    ...mapActions(['']),
+    ...mapMutations(['setDetectedImage']),
+    ...mapActions(['analysisImage']),
     async loadFaceApiModels() {
       await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
       await faceapi.nets.faceLandmark68Net.loadFromUri("/models");
       console.log("Face API models loaded");
     },
-    generateSpeech() {
-      const text = this.currentQuestion.question;
-      this.textToSpeech(text);
-    },
-    textToSpeech(text) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      this.synth.speak(utterance);
-    },
     startRec() {
       this.$refs.video.srcObject = null;
-      this.captureCamera((camera) => {
+      this.captureCamera((stream) => {
         const video = this.$refs["video"];
-        video.muted = true;
-        video.volume = 0;
-        video.srcObject = camera;
-        this.recorder = camera;
+        video.srcObject = stream;
       });
     },
     captureCamera(callback) {
@@ -99,33 +91,77 @@ export default {
           console.error(error);
         });
     },
-    async captureAndAnalyze() {
-      const canvas = this.$refs.captureCanvas;
-      const video = this.$refs.video;
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+    async detectFace() {
+      try {
+        console.log("captureAndAnalyze 시작");
 
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const canvas = this.$refs.captureCanvas;
+        const video = this.$refs.video;
 
-      // 얼굴 윤곽 인식
-      const detections = await faceapi.detectAllFaces(
-        canvas,
-        new faceapi.TinyFaceDetectorOptions()
-      );
-      if (detections.length === 0) {
-        alert("얼굴을 인식하지 못했습니다. 다시 시도해주세요.");
-        return;
+        if (!video.videoWidth || !video.videoHeight) {
+          console.error("비디오 크기 확인 실패", { videoWidth: video.videoWidth, videoHeight: video.videoHeight });
+          alert("비디오가 준비되지 않았습니다. 다시 시도해주세요.");
+          return;
+        }
+        console.log("비디오 크기 확인 완료");
+
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        console.log("캔버스에 비디오 그리기 완료", ctx);
+
+        console.log("얼굴 인식 시작");
+        const detections = await faceapi.detectAllFaces(
+          canvas,
+          new faceapi.TinyFaceDetectorOptions()
+        );
+        console.log("얼굴 인식 결과:", detections);
+
+        if (!detections || detections.length === 0) {
+          console.warn("얼굴을 인식하지 못함");
+          alert("얼굴을 인식하지 못했습니다. 얼굴을 화면 중앙에 맞추고 다시 시도해주세요.");
+          return;
+        }
+
+        const faceBox = {
+          x: detections[0].box._x,
+          y: detections[0].box._y,
+          width: detections[0].box._width,
+          height: detections[0].box._height,
+        };
+        console.log("첫 번째 얼굴 박스:", faceBox);
+
+        const faceCanvas = this.extractFace(canvas, faceBox);
+        console.log("faceCanvas 크기:", faceCanvas.width, faceCanvas.height);
+
+        // faceCanvas를 이미지로 변환
+        this.imageSrc = faceCanvas.toDataURL();
+        // faceCanvas를 Blob으로 변환
+        faceCanvas.toBlob((blob) => {
+          this.setDetectedImage(blob);
+        })
+      } catch (error) {
+        console.error("전체 프로세스에서 오류 발생", error);
+        alert("분석 중 알 수 없는 오류가 발생했습니다. 다시 시도해주세요.");
       }
+    },
+    async analyze() {
+      const resultPca = await this.analysisImage();
+      console.log(resultPca);
+      alert(`퍼스널 컬러 분석 결과...${resultPca.data.tone}`);
+    },
+    extractFace(canvas, faceBox) {
+      try {
+        console.log("extractFace 시작:", faceBox);
 
-      // 얼굴 영역 추출
-      const faceBox = detections[0].box;
-      const faceCanvas = document.createElement("canvas");
-      faceCanvas.width = faceBox.width;
-      faceCanvas.height = faceBox.height;
-      faceCanvas
-        .getContext("2d")
-        .drawImage(
+        const faceCanvas = document.createElement("canvas");
+        faceCanvas.width = faceBox.width;
+        faceCanvas.height = faceBox.height;
+
+        const faceCtx = faceCanvas.getContext("2d");
+        faceCtx.drawImage(
           canvas,
           faceBox.x,
           faceBox.y,
@@ -137,15 +173,24 @@ export default {
           faceBox.height
         );
 
-      // 주요 색상 추출
-      const colorThief = new ColorThief();
-      const dominantColor = colorThief.getColor(faceCanvas);
-      this.personalColor = this.analyzePersonalColor(dominantColor);
-
-      alert(`당신의 퍼스널컬러는 ${this.personalColor}입니다!`);
+        console.log("extractFace 완료");
+        return faceCanvas;
+      } catch (extractError) {
+        console.error("extractFace 중 오류 발생", extractError);
+        throw extractError; // 상위로 에러 전달
+      }
+    },
+    generateSpeech() {
+      const text = this.currentQuestion.question;
+      this.textToSpeech(text);
+    },
+    textToSpeech(text) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      this.synth.speak(utterance);
     },
     analyzePersonalColor([r, g, b]) {
-      // 간단한 퍼스널컬러 분석 로직 (예: 톤 기반)
+      console.log("analyzePersonalColor 시작:", { r, g, b });
+
       if (r > g && r > b) return "Warm (Spring/Autumn)";
       if (b > r && b > g) return "Cool (Winter/Summer)";
       return "Neutral";
