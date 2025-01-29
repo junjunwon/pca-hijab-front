@@ -6,16 +6,37 @@ const store = createStore({
   state: {
     user: {
       email: '',
+      imageSrc: '',
       detectedImageBlob: '',
+      personalColor: {
+        resultTone: '',
+        description: '',
+      }
+      
+    }
+  },
+  getters: {
+    getUser(state) {
+      return state.user;
     }
   },
   mutations: {
     setUserEmail(state, email) {
       state.user.email = email;
     },
+    setDetectedImageSrc(state, blob) {
+      state.user.imageSrc = blob;
+    },
     setDetectedImage(state, blob) {
       state.user.detectedImageBlob = blob;
-      console.log(state.user.detectedImageBlob);
+    },
+    setPersonalColor(state, personalColor) {
+      state.user.personalColor.resultTone = personalColor.tone;
+      state.user.personalColor.description = personalColor.description;
+    },
+    resetPca(state) {
+      state.user.detectedImageBlob = '';
+      state.user.personalColor = {};
     }
   },
   actions: {
@@ -35,9 +56,6 @@ const store = createStore({
         console.error('Error analysisImage:', error);
       }
     },
-  },
-  getters: {
-    
   },
   plugins: [createPersistedState({
     storage: window.localStorage,

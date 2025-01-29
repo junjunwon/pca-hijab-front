@@ -6,7 +6,7 @@
       <!-- 중간의 질문과 비디오 녹화 -->
       <div class="content">
         <div class="question-area">
-          <p class="nav"><span class="n">{{ "test" }}</span></p>
+          <p class="nav"><span class="n">{{ "📸" }}</span></p>
           <p class="title">{{ guideSentence }}
             <span @click="generateSpeech" class="speaker -on"></span>
           </p>
@@ -24,8 +24,13 @@
     </div>
     <!-- 하단 버튼 -->
     <div class="">
-      <button @click="detectFace">Detect Face</button>
-      <button v-if=imageSrc @click="analyze">Analyze Personal Color</button>
+      <div>
+        <input multiple @change="imageUpload()" ref="images" type="file" />
+      </div>
+      <div>
+        <button @click="detectFace">Detect Face</button>
+        <button @click="analyze">Analyze Personal Color</button>
+      </div>
     </div>
   </div>
 </template>
@@ -49,7 +54,8 @@ export default {
       personalColor: null, // 분석 결과 저장
       image: new Image(),
       imageSrc: '',
-      guideSentence: '📸 머리카락은 뒤로 남기고, 맨 얼굴로 정면을 바라봐주세요.',
+      guideSentence: '머리카락은 뒤로 넘기고, 맨 얼굴로 정면을 바라봐주세요.',
+      file: '',
 
     };
   },
@@ -65,7 +71,7 @@ export default {
     this.startRec();
   },
   methods: {
-    ...mapMutations(['setDetectedImage']),
+    ...mapMutations(['setDetectedImage', 'setPersonalColor', 'setDetectedImageSrc']),
     ...mapActions(['analysisImage']),
     async loadFaceApiModels() {
       await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
@@ -140,6 +146,7 @@ export default {
 
         // faceCanvas를 이미지로 변환
         this.imageSrc = faceCanvas.toDataURL();
+        this.setDetectedImageSrc(this.imageSrc);
         // faceCanvas를 Blob으로 변환
         faceCanvas.toBlob((blob) => {
           this.setDetectedImage(blob);
@@ -151,13 +158,10 @@ export default {
     },
     async analyze() {
       //TODO: debounce 적용 필요
-      const resultPca = await this.analysisImage();
-      console.log(resultPca);
-      //loading바에 아래 문구 추가하면 좋을듯?
-      // '잠시만 기다려주세요...\n' +
-      //                       'AI가 당신의 퍼스널 컬러를 분석하여 \n' +
-      //                       '어울리는 히잡 컬러를 추천해드립니다 ✨
-      alert(`퍼스널 컬러 분석 결과...${resultPca.data.tone} (TODO: 별도 결과 페이지 구성 필요)`);
+      const resultPersonalColor = await this.analysisImage();
+      console.log(resultPersonalColor);
+      this.setPersonalColor(resultPersonalColor.data);
+      this.$router.push({ name: 'PcaResult' });
     },
     extractFace(canvas, faceBox) {
       try {
@@ -194,6 +198,54 @@ export default {
       const utterance = new SpeechSynthesisUtterance(text);
       this.synth.speak(utterance);
     },
+    async imageUpload() {
+      // refs 속성을 이용해 input 태그에 접근함
+      this.file = this.$refs.images.files[0];
+      console.log(this.file);
+      this.setDetectedImageSrc(URL.createObjectURL(this.file));
+
+      try {
+        const fileBlob = await this.handleFile();
+        console.log('Blob 변환 완료:', fileBlob);
+        this.setDetectedImage(fileBlob);
+      } catch (error) {
+        console.error('Blob 변환 실패:', error);
+      }
+    },
+    handleFile() {
+      return new Promise((resolve, reject) => {
+        if (this.file) {
+          const reader = new FileReader();
+          
+          reader.onload = (e) => {
+            try {
+              // Base64 데이터를 Blob으로 변환
+              const binaryStr = atob(e.target.result.split(',')[1]);
+              const len = binaryStr.length;
+              const arr = new Uint8Array(len);
+
+              for (let i = 0; i < len; i++) {
+                arr[i] = binaryStr.charCodeAt(i);
+              }
+
+              const blob = new Blob([arr], { type: this.file.type });
+              resolve(blob);
+            } catch (error) {
+              reject(error);
+            }
+          };
+
+          reader.onerror = (error) => {
+            reject(error);
+          };
+
+          reader.readAsDataURL(this.file);
+        } else {
+          reject(new Error('파일이 없습니다.'));
+        }
+      });
+    },
+    //Deprecated
     analyzePersonalColor([r, g, b]) {
       console.log("analyzePersonalColor 시작:", { r, g, b });
 
