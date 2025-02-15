@@ -1,16 +1,19 @@
 <template>
   <div class="container step4">
     <div class="card">
-      <h2 class="title">You are a {{ personalColor.resultTone }}</h2>
-      <p class="subtitle">Email: {{}} </p>
-      <div>
-        <p class="subtitle">{{ personalColor.description }} </p>
+      <div class="content">
+          <h2 class="title">You are a {{ personalColor.resultTone }}</h2>
+          <p class="subtitle">Email: {{}} </p>
+          <p class="subtitle">{{ personalColor.description }} </p>
       </div>
-      <div>
-        <img :src="resultImageSrc" alt="Face Image" />
-      </div>
-      <div class="box">
-        <button @click="restartPca">처음으로 가기</button>
+      <div class="">
+        <div>
+          <img :src="resultImageSrc" alt="Face Image" />
+        </div>
+        <div>
+          <button @click="restartPca">Back to Home</button>
+          <button @click="showProduct">Discover Your Hijab</button>
+        </div>
       </div>
     </div>
   </div>
@@ -43,6 +46,9 @@ export default {
     restartPca() {
       this.resetPca();
       this.$router.push({ name: 'Home' });
+    },
+    showProduct() {
+      alert('준비중...');
     }
   }
 };

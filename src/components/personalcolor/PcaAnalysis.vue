@@ -1,5 +1,5 @@
 <template>
-  <div class="container  step4">
+  <div class="container step4">
     <!-- 상단 로딩바 -->
     <LoadingBar :isLoading="isLoading" />
     <div class="card">
@@ -36,12 +36,9 @@
 </template>
 
 <script>
-// import axios from '../../plugins/axios';
 import * as faceapi from "face-api.js";
-// import ColorThief from "colorthief";
 import { mapState, mapMutations, mapActions, mapGetters } from 'vuex';
-import LoadingBar from '../util/LoadingBar.vue';
-
+import LoadingBar from '../common/LoadingBar.vue';
 export default {
   components: {
     LoadingBar
@@ -66,6 +63,7 @@ export default {
   watch: {
   },
   mounted() {
+    this.isLoading = true;
     this.generateSpeech();
     this.loadFaceApiModels();
     this.startRec();
@@ -93,6 +91,7 @@ export default {
         })
         .then((camera) => {
           callback(camera);
+          this.isLoading = false;
         })
         .catch((error) => {
           alert("Unable to capture your camera. Please check console logs.");

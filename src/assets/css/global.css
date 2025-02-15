@@ -1,12 +1,14 @@
 @charset "UTF-8";
 <link href="https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/static/woff2/SUIT.css" rel="stylesheet">
  body {font-family: 'suit'}
-.container {
+ .container {
     display: flex;
-    flex-direction: column; /* 세로 방향 정렬 */
-    justify-content: space-evenly; /* 수직 중앙 정렬 */
+    flex-direction: column;
+    justify-content: center; /* 수직 중앙 정렬 */
     align-items: center; /* 가로 중앙 정렬 */
     width: 100%;
+    max-width: 800px;
+    margin: auto; /* 가로 가운데 정렬 */
 }
 
 .box {
@@ -146,8 +148,6 @@ button {
     /* opacity: 0px; */
 }
 
-
-
 /* 기존 css 제거대상 */
 .loading-bar {
     position: fixed;
@@ -185,63 +185,6 @@ button {
   
   th {
     background-color: #f2f2f2;
-  }
-
-  /* 노트 스타일 */
-  .oxford-textarea {
-    /* 넓이 및 패딩 */
-    width: 330px;
-    height: 250px;
-    padding: 2px 16px;
-  
-    /* 반응형 높이 설정 */
-    min-height: 150px;
-    max-height: 50vh;
-  
-    /* 여백과 글씨 크기 */
-    margin: 10px 10px;
-    font-size: 16px;
-    /*font-family: 'Times New Roman', serif;*/
-  
-    /* 테두리 및 모서리 둥글게 */
-    border: 1px solid #c0c0c0;
-    border-radius: 4px;
-  
-    /* 옥스포드 노트 느낌의 배경 색상 */
-    background-color: #fff8dc; /* 노란 종이 색상 (Light Yellow) */
-  
-    /* 가로줄 추가: 투명과 회색 줄을 반복해서 노트 느낌 만들기 */
-    background-image: linear-gradient(transparent 85%, rgba(0, 0, 0, 0.1) 85%);
-    background-size: 100% 32px; /* 줄 간격 조정 */
-    background-attachment: local; /* 스크롤 시 줄 고정 */
-  
-    /* 텍스트 줄 간격 설정 */
-    line-height: 32px;
-  
-    /* 텍스트 입력 시 수직으로 스크롤 가능 */
-    overflow-y: auto;
-  
-    /* 외부 윤곽선 제거 */
-    outline: none;
-  
-    /* 테두리와 그림자 효과의 부드러운 전환 */
-    transition: box-shadow 0.2s ease-in-out, border 0.2s ease-in-out;
-  }
-  
-  /* 포커스 시 효과 */
-  .oxford-textarea:focus {
-    /* 포커스 시 테두리 색상 변경 */
-    border: 1px solid #6b8e23;
-  
-    /* 포커스 시 그림자 효과 */
-    box-shadow: 0 0 5px rgba(107, 142, 35, 0.5);
-  }
-  
-  /* 플레이스홀더 스타일 */
-  .oxford-textarea::placeholder {
-    /* 플레이스홀더 색상 */
-    color: #a0a0a0;
-    font-style: italic;
   }
 
   /* 콤보박스 크기를 줄이기 위한 스타일 */
