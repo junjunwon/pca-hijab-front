@@ -7,10 +7,6 @@
       <div class="content">
         <div class="question-area">
           <p class="nav"><span class="n">{{ "📸" }}</span></p>
-          <p class="title">{{ guideSentence }}
-            <span @click="generateSpeech" class="speaker -on"></span>
-          </p>
-          <!-- <p v-else>로딩 중...</p> -->
         </div>
 
         <div class="box">
@@ -46,12 +42,9 @@ export default {
   data() {
     return {
       isLoading: false,
-      synth: window.speechSynthesis,
-      isRecording: false, // 음성 인식 상태 확인
       personalColor: null, // 분석 결과 저장
       image: new Image(),
       imageSrc: '',
-      guideSentence: '머리카락은 뒤로 넘기고, 맨 얼굴로 정면을 바라봐주세요.',
       file: '',
 
     };
@@ -64,7 +57,6 @@ export default {
   },
   mounted() {
     this.isLoading = true;
-    this.generateSpeech();
     this.loadFaceApiModels();
     this.startRec();
   },
@@ -81,6 +73,7 @@ export default {
       this.captureCamera((stream) => {
         const video = this.$refs["video"];
         video.srcObject = stream;
+        this.startWebSocket();  // WebSocket 연결 시작
       });
     },
     captureCamera(callback) {
@@ -88,6 +81,7 @@ export default {
         .getUserMedia({
           video: true,
           audio: false,
+          with: 393,
         })
         .then((camera) => {
           callback(camera);
@@ -190,13 +184,6 @@ export default {
         throw extractError; // 상위로 에러 전달
       }
     },
-    generateSpeech() {
-      this.textToSpeech(this.guideSentence);
-    },
-    textToSpeech(text) {
-      const utterance = new SpeechSynthesisUtterance(text);
-      this.synth.speak(utterance);
-    },
     async imageUpload() {
       // refs 속성을 이용해 input 태그에 접근함
       this.file = this.$refs.images.files[0];
@@ -244,13 +231,37 @@ export default {
         }
       });
     },
-    //Deprecated
-    analyzePersonalColor([r, g, b]) {
-      console.log("analyzePersonalColor 시작:", { r, g, b });
+    startWebSocket() {
+      const socket = new WebSocket("ws://172.23.19.84:3000/ws");  // WebSocket 연결 시도
+      const timeoutDuration = 5000;  // 5초 타임아웃 설정 (필요 시 조정)
 
-      if (r > g && r > b) return "Warm (Spring/Autumn)";
-      if (b > r && b > g) return "Cool (Winter/Summer)";
-      return "Neutral";
+      // 타임아웃 처리
+      const timeout = setTimeout(() => {
+        if (socket.readyState === WebSocket.CONNECTING) {  // 아직 연결 중이면
+          socket.close();  // 강제 종료
+          console.log("WebSocket 연결 타임아웃: 5초 내 연결 실패");
+        }
+      }, timeoutDuration);
+
+      socket.onopen = () => {
+        clearTimeout(timeout);  // 연결 성공 시 타임아웃 취소
+        console.log("WebSocket 연결 성공");
+        // 필요 시 스트림 전송 로직 추가
+      };
+
+      socket.onerror = (error) => {
+        clearTimeout(timeout);  // 오류 발생 시 타임아웃 취소
+        console.error("WebSocket 오류:", error);
+      };
+
+      socket.onclose = () => {
+        clearTimeout(timeout);  // 연결 종료 시 타임아웃 취소
+        console.log("WebSocket 연결 종료");
+      };
+
+      socket.onmessage = (message) => {
+        console.log("서버로부터 메시지 수신:", message.data);
+      };
     },
   },
 };

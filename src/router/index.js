@@ -3,7 +3,6 @@ import { createRouter, createWebHistory } from 'vue-router';
 import HomePage from '../views/HomePage.vue';
 import PcaResult from '../components/personalcolor/PcaResult.vue';
 import PcaAnalysis from '../components/personalcolor/PcaAnalysis.vue';
-import CoupangAd from '@/components/common/CoupangAd.vue';
 
 const routes = [
   {
@@ -20,11 +19,6 @@ const routes = [
     path: '/analysis',
     name: 'PcaAnalysis',
     component: PcaAnalysis
-  },
-  {
-    path: '/coupang-ad',
-    name: 'CoupangAd',
-    component: CoupangAd
   }
 ];
 

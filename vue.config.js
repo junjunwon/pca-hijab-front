@@ -3,7 +3,7 @@ const { defineConfig } = require('@vue/cli-service')
 
 module.exports = defineConfig({
   transpileDependencies: true,
-  outputDir: path.resolve(__dirname, '../assistant/src/main/resources/static/'),
+  outputDir: path.resolve(__dirname, '../hijab/src/main/resources/static/'),
   devServer: {
     port: process.env.VUE_APP_PORT,
     proxy: {

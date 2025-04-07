@@ -5,7 +5,6 @@ import axios from '../plugins/axios';
 const store = createStore({
   state: {
     user: {
-      email: '',
       imageSrc: '',
       detectedImageBlob: '',
       personalColor: {
@@ -21,9 +20,6 @@ const store = createStore({
     }
   },
   mutations: {
-    setUserEmail(state, email) {
-      state.user.email = email;
-    },
     setDetectedImageSrc(state, blob) {
       state.user.imageSrc = blob;
     },
@@ -42,7 +38,6 @@ const store = createStore({
   actions: {
     async analysisImage({ state }) {
       const formData = new FormData();
-      formData.append("email", state.user.email);
       formData.append("image", state.user.detectedImageBlob, "face-image.png");
       try {
         const response = await axios.post('/color/analysis', formData, {

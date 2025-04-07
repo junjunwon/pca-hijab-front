@@ -3,7 +3,6 @@
     <div class="card">
       <div class="content">
           <h2 class="title">You are a {{ personalColor.resultTone }}</h2>
-          <p class="subtitle">Email: {{}} </p>
           <p class="subtitle">{{ personalColor.description }} </p>
       </div>
       <div class="">
@@ -25,15 +24,11 @@ import { mapMutations, mapActions, mapGetters } from 'vuex';
 export default {
   data() {
     return {
-      email: '',
       personalColor: {},
       resultImageSrc: '',
     };
   },
   async mounted() {
-    console.log('this.getUser');
-    console.log(this.getUser);
-    this.email = this.getUser.email;
     this.personalColor = this.getUser.personalColor;
     this.resultImageSrc = this.getUser.imageSrc;
   },
