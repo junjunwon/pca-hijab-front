@@ -54,7 +54,7 @@ export default defineComponent({
       const result = this.getPcaResult;
 
       if (!result) {
-        this.$router.push({ name: 'Home' });
+        return;
       }
 
       responded = true;
@@ -85,8 +85,6 @@ export default defineComponent({
   },
 });
 </script>
-
-
 <style scoped>
 .loading-container {
   height: 100vh;

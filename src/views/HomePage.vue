@@ -22,16 +22,16 @@
 
         <div class="face-check">
           <div class="face-item">
-            <v-img src="@/assets/hijab-introduction.svg" alt="full face visible" />
-            <span class="caption success">Good lighting, full face visible</span>
+            <v-img src="@/assets/hijab-temp2.png" alt="full face visible" />
+            <span class="caption success">Good lighting,<br />full face visible</span>
           </div>
           <div class="face-item">
-            <v-img src="@/assets/hijab-introduction.svg" alt="partly in shadow" />
-            <span class="caption error">Face is partly in shadow</span>
+            <v-img src="@/assets/hijab-temp2.png" alt="partly in shadow" />
+            <span class="caption error">Face is partly<br />in shadow</span>
           </div>
           <div class="face-item">
-            <v-img src="@/assets/hijab-introduction.svg" alt="face covered" />
-            <span class="caption error">Face is mostly covered</span>
+            <v-img src="@/assets/hijab-temp2.png" alt="face covered" />
+            <span class="caption error">Face is mostly<br />covered</span>
           </div>
         </div>
       </div>
@@ -215,7 +215,7 @@ export default {
       }
 
       .caption {
-        font-size: 14px;
+        font-size: 11px;
         display: block;
 
         &.success {

@@ -1,84 +1,66 @@
 <template>
   <MobileLayout>
-    <v-container fluid class="pa-0 gallery-page">
-      <!-- 히잡 배경 이미지 -->
-      <v-img
-          src="@/assets/hijab-introduction.svg"
-          height="200"
-          cover
-          class="w-100"
-      />
+    <v-container fluid class="pa-0 result-page">
 
-      <!-- 이모지 + 컬러명 + 설명 -->
-      <div class="text-center my-6">
-        <div class="text-3xl">🎨</div>
-        <h2 class="text-xl font-bold mt-2">{{ personalColor.resultTone }}</h2>
-        <p class="mt-2 px-4 text-gray-600 text-sm">
-          {{ personalColor.description }}
-        </p>
-      </div>
+      <!-- 상단 배경 및 인물 일러스트 -->
+      <div class="top-banner red-gradient"></div>
 
-      <!-- 퍼스널컬러와 연관된 색상들 -->
-      <v-row class="pa-4" dense>
-        <v-col
-            v-for="(color, index) in colorPalette"
-            :key="index"
-            cols="4"
-            class="pa-1"
-        >
-          <div :style="{ backgroundColor: color }" class="color-box" />
-        </v-col>
-      </v-row>
+      <!-- 결과 정보 -->
+      <div class="result-card">
+        <div class="sparkle-icon">✨</div>
+        <h2 class="title">{{ personalColor.resultTone }}</h2>
+        <p class="subtitle">{{ personalColor.description }}</p>
 
-      <!-- 이모지 + Color Match 문구 -->
-      <div class="text-center mt-6">
-        <div class="text-2xl">🛍️</div>
-        <h3 class="text-base font-semibold mt-1">Your Color Match</h3>
-      </div>
+        <!-- 점수 -->
+        <v-row justify="center" class="score-row">
+          <v-col cols="4" class="score-item">
+            <div class="score">86%</div>
+            <div class="label">Warm Tone</div>
+          </v-col>
+          <v-col cols="4" class="score-item">
+            <div class="score">63%</div>
+            <div class="label">Spring</div>
+          </v-col>
+          <v-col cols="4" class="score-item">
+            <div class="score">76%</div>
+            <div class="label">Bright</div>
+          </v-col>
+        </v-row>
 
-      <!-- 상품 리스트 갤러리 -->
-      <v-row class="pa-4" dense>
-        <v-col
-            v-for="(item, i) in products"
-            :key="i"
-            cols="6"
-            class="pa-1"
-        >
-          <v-card
-              class="rounded-lg overflow-hidden"
-              height="160"
-              flat
+        <v-divider class="my-8" />
+
+        <!-- 컬러 매치 -->
+        <div class="text-center">
+          <div class="drop-icon">💧</div>
+          <h3 class="color-match-title">Your Color Match</h3>
+        </div>
+
+        <!-- 상품 리스트 -->
+        <v-row class="pa-2 product-list" dense>
+          <v-col
+              v-for="(item, i) in products"
+              :key="i"
+              cols="4"
+              class="pa-1"
           >
-            <v-img
-                :src="item.image"
-                height="120"
-                cover
-            />
-            <div class="text-xs pa-2 text-center">{{ item.name }}</div>
-          </v-card>
-        </v-col>
-      </v-row>
+            <v-card class="rounded-lg overflow-hidden" flat>
+              <v-img
+                  :src="item.image"
+                  height="100"
+                  cover
+              />
+              <div class="product-name">{{ item.name }}</div>
+            </v-card>
+          </v-col>
+        </v-row>
 
-      <!-- Shop now 버튼 -->
-      <div class="text-center mt-4 mb-6">
-        <v-btn
-            @click="redirectToBrand"
-            color="primary"
-            class="rounded-pill px-10 text-capitalize"
-        >
-          Shop Now
+        <!-- 버튼 -->
+        <v-btn @click="redirectToBrand" class="app-button-red" block rounded size="x-large">
+          <strong>Shop now</strong>
         </v-btn>
-      </div>
-      <!-- 다시 분석하러 가기 버튼 -->
-      <div class="text-center mt-2 mb-8">
-        <v-btn
-            variant="outlined"
-            color="secondary"
-            class="rounded-pill px-8 text-capitalize"
-            @click="restartPca"
-        >
-          다시 분석하러 가기
-        </v-btn>
+        <div @click="restartPca" class="share-result text-center mt-2">
+          go back
+        </div>
       </div>
     </v-container>
   </MobileLayout>
@@ -96,10 +78,9 @@ export default defineComponent({
         '#D8B4A0', '#B89C8E', '#ECC1A1'
       ],
       products: [
-        { name: 'Peach Hijab', image: '@/assets/hijab-introduction.svg' },
-        { name: 'Beige Classic', image: '@/assets/hijab-introduction.svg' },
-        { name: 'Autumn Mood', image: '@/assets/hijab-introduction.svg' },
-        { name: 'Natural Brown', image: '@/assets/hijab-introduction.svg' }
+        { name: 'Peach Hijab', image: require('@/assets/hijab-temp.svg') },
+        { name: 'Beige Classic', image: require('@/assets/hijab-temp.svg') },
+        { name: 'Autumn Mood', image: require('@/assets/hijab-temp.svg') },
       ],
       personalColor: {},
       resultImageSrc: '',
@@ -126,13 +107,94 @@ export default defineComponent({
 });
 </script>
 <style scoped>
-.gallery-page {
+.result-page {
   background-color: #fffaf5;
 }
 
-.color-box {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 6px;
+.red-gradient {
+  background: linear-gradient(180deg, #ff5757 0%, #ffb8b8 100%);
+  height: 160px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding-bottom: 20px;
+}
+
+.character-img {
+  width: 140px;
+  height: auto;
+}
+
+.result-card {
+  background-color: white;
+  border-radius: 24px 24px 0 0;
+  margin-top: -24px;
+  padding: 24px 16px 40px;
+}
+
+.sparkle-icon {
+  font-size: 20px;
+  text-align: center;
+}
+
+.title {
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+  margin-top: 4px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #888;
+  text-align: center;
+  margin-top: 4px;
+}
+
+.score-row {
+  margin-top: 24px;
+}
+
+.score-item {
+  text-align: center;
+}
+
+.score {
+  font-size: 20px;
+  font-weight: 600;
+  color: #ff5757;
+}
+
+.label {
+  font-size: 12px;
+  color: #666;
+}
+
+.color-match-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+.drop-icon {
+  font-size: 20px;
+}
+
+.share-result {
+  font-size: 14px;
+  color: #aaa;
+  text-decoration: underline;
+}
+
+.product-name {
+  font-size: 11px;
+  line-height: 1.2;
+  text-align: center;
+  margin-top: 4px;
+  color: #333;
+}
+
+.product-list {
+  margin-bottom: 24px;
 }
 </style>
