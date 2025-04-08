@@ -83,7 +83,9 @@ export default {
 
         // 분석 페이지로 이동
         this.$router.push({ name: 'Loading' }); // or 'PcaResult'
-        await this.analyze();
+        setTimeout(() => {
+          this.analyze();
+        }, 100); // 100~300ms 사이 실험 가능
       } catch (error) {
         console.error('Blob 변환 실패:', error);
         alert('이미지 업로드에 실패했습니다. 다시 시도해주세요.');

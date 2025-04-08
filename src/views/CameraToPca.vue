@@ -87,9 +87,7 @@ export default defineComponent({
     async detectToPca() {
       await this.detectFace();
       this.$router.push({ name: 'Loading' });
-      setTimeout(() => {
-        this.analyze();
-      }, 100); // 100~300ms 사이 실험 가능
+      await this.analysisImage();
     },
     async detectFace() {
       try {
@@ -147,17 +145,6 @@ export default defineComponent({
         console.error("전체 프로세스에서 오류 발생", error);
         alert("분석 중 알 수 없는 오류가 발생했습니다. 다시 시도해주세요.");
       }
-    },
-    async analyze() {
-      //TODO: debounce 적용 필요
-      const resultPersonalColor = await this.analysisImage();
-      if (!resultPersonalColor) {
-        console.error("분석 결과가 없습니다.");
-        alert("분석 결과를 가져오는 데 실패했습니다. 다시 시도해주세요.");
-        return;
-      }
-      console.log(resultPersonalColor);
-      this.setPersonalColor(resultPersonalColor.data);
     },
     extractFace(canvas, faceBox) {
       try {

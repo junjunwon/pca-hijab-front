@@ -69,11 +69,11 @@ const store = createStore({
             'Content-Type': 'multipart/form-data',
           }
         });
-
         this.commit('setPcaResult', { success: true, errorMsg: '' });
-        return response;
+        this.commit('setPersonalColor', response.data);
       } catch (error) {
         console.error('Error analysisImage:', error);
+        alert("분석 결과를 가져오는 데 실패했습니다. 다시 시도해주세요.");
         this.commit('setPcaResult', { success: false, errorMsg: 'Error occurred during analysis.' });
       }
     },
