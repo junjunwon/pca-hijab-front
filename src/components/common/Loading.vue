@@ -4,19 +4,22 @@
         class="loading-container d-flex flex-column align-center justify-center text-center"
         fluid
     >
-      <!-- 로딩 이모지 & 메시지 -->
-      <div class="emoji text-4xl mb-4">⏳</div>
-      <h2 class="text-h6 font-weight-medium mb-2">당신의 퍼스널 컬러를 분석 중입니다</h2>
-      <p class="text-subtitle-2 text-grey-darken-1 mb-6">
-        잠시만 기다려 주세요!
+      <!-- 일러스트/이모지 -->
+      <div class="emoji">💫</div>
+
+      <!-- 메시지 -->
+      <h2 class="loading-title">Analyzing Your Personal Color</h2>
+      <p class="loading-subtitle">
+        Finding the colors that make you shine ✨
       </p>
 
       <!-- 로딩 바 -->
       <v-progress-linear
           indeterminate
-          color="primary"
-          class="loading-bar"
-          height="6"
+          color="#FF6B6B"
+          class="loading-bar mt-8"
+          height="8"
+          rounded
       />
     </v-container>
   </MobileLayout>
@@ -88,8 +91,25 @@ export default defineComponent({
 <style scoped>
 .loading-container {
   height: 100vh;
-  background: #fffaf5;
-  padding: 32px;
+  background: linear-gradient(180deg, #ff5757 0%, #ffb8b8 100%);
+  color: white;
+  padding: 32px 16px;
+}
+
+.emoji {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.loading-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.loading-subtitle {
+  font-size: 14px;
+  opacity: 0.9;
 }
 
 .loading-bar {
