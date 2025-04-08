@@ -4,6 +4,7 @@ const { defineConfig } = require('@vue/cli-service')
 module.exports = defineConfig({
   transpileDependencies: true,
   outputDir: path.resolve(__dirname, '../hijab/src/main/resources/static/'),
+
   devServer: {
     port: process.env.VUE_APP_PORT,
     proxy: {
@@ -11,5 +12,11 @@ module.exports = defineConfig({
         target: process.env.VUE_APP_API_BASE_URL,
       },
     }
+  },
+
+  pluginOptions: {
+    vuetify: {
+			// https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vuetify-loader
+		}
   }
 })

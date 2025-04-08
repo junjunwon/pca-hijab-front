@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
-// import store from '../store';
 import HomePage from '../views/HomePage.vue';
-import PcaResult from '../components/personalcolor/PcaResult.vue';
-import PcaAnalysis from '../components/personalcolor/PcaAnalysis.vue';
+import CameraToPca from '../views/CameraToPca.vue';
+import PcaResult from '../views/PcaResult.vue';
+import Loading from '../components/common/Loading.vue';
 
 const routes = [
   {
@@ -11,15 +11,20 @@ const routes = [
     component: HomePage
   },
   {
+    path: '/camera',
+    name: 'CameraToPca',
+    component: CameraToPca
+  },
+  {
     path: '/result',
     name: 'PcaResult',
     component: PcaResult
   },
   {
-    path: '/analysis',
-    name: 'PcaAnalysis',
-    component: PcaAnalysis
-  }
+    path: '/loading',
+    name: 'Loading',
+    component: Loading
+  },
 ];
 
 const router = createRouter({

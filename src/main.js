@@ -1,12 +1,14 @@
-import { createApp } from 'vue';
-import App from './App.vue';
-import router from './router';
-import store from './store';
+import { createApp } from 'vue'
+import App from './App.vue'
+import router from './router'
+import store from './store'
+import vuetify from './plugins/vuetify'
+import { loadFonts } from './plugins/webfontloader'
 
-// 전역 CSS 파일 추가
-import './assets/css/global.css';
+loadFonts()
 
 createApp(App)
   .use(router)
   .use(store)
-  .mount('#app');
+  .use(vuetify)
+  .mount('#app')

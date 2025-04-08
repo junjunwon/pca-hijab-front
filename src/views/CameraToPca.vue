@@ -1,43 +1,28 @@
 <template>
-  <div class="container step4">
-    <!-- 상단 로딩바 -->
-    <LoadingBar :isLoading="isLoading" />
-    <div class="card">
-      <!-- 중간의 질문과 비디오 녹화 -->
-      <div class="content">
-        <div class="question-area">
-          <p class="nav"><span class="n">{{ "📸" }}</span></p>
-        </div>
-
-        <div class="box">
-          <div class="video-area">
-            <video autoplay muted ref="video"></video>
-            <img v-if=imageSrc :src="imageSrc" alt="Face Image" />
-          </div>
-        </div>
-        <canvas ref="captureCanvas" style="display: none;"></canvas>
+  <MobileLayout>
+    <div class="camera-full">
+      <video ref="video" autoplay playsinline muted></video>
+      <!-- 얼굴 가이드 원 -->
+      <div class="face-guide" />
+      <!-- 캡처 버튼 (원형) -->
+      <div class="camera-button-area">
+        <button class="shutter-button" @click="detectToPca" />
       </div>
+<!--      <v-img v-if=imageSrc :src="imageSrc" class="overlay-image" cover />-->
+      <canvas ref="captureCanvas" class="hidden-canvas"></canvas>
     </div>
-    <!-- 하단 버튼 -->
-    <div class="">
-      <div>
-        <input multiple @change="imageUpload()" ref="images" type="file" />
-      </div>
-      <div>
-        <button @click="detectFace">Detect Face</button>
-        <button @click="analyze">Analyze Personal Color</button>
-      </div>
-    </div>
-  </div>
+  </MobileLayout>
 </template>
 
 <script>
 import * as faceapi from "face-api.js";
 import { mapState, mapMutations, mapActions, mapGetters } from 'vuex';
-import LoadingBar from '../common/LoadingBar.vue';
-export default {
+// import Loading from '../common/Loading.vue';
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   components: {
-    LoadingBar
+    // Loading
   },
   data() {
     return {
@@ -78,19 +63,26 @@ export default {
     },
     captureCamera(callback) {
       navigator.mediaDevices
-        .getUserMedia({
-          video: true,
-          audio: false,
-          with: 393,
-        })
-        .then((camera) => {
-          callback(camera);
-          this.isLoading = false;
-        })
-        .catch((error) => {
-          alert("Unable to capture your camera. Please check console logs.");
-          console.error(error);
-        });
+          .getUserMedia({
+            video: { facingMode: 'user' },
+            audio: false,
+            with: 393,
+          })
+          .then((camera) => {
+            callback(camera);
+            this.isLoading = false;
+          })
+          .catch((error) => {
+            alert("Unable to capture your camera. Please check console logs.");
+            console.error(error);
+          });
+    },
+    async detectToPca() {
+      await this.detectFace();
+      this.$router.push({ name: 'Loading' });
+      setTimeout(() => {
+        this.analyze();
+      }, 100); // 100~300ms 사이 실험 가능
     },
     async detectFace() {
       try {
@@ -115,8 +107,8 @@ export default {
 
         console.log("얼굴 인식 시작");
         const detections = await faceapi.detectAllFaces(
-          canvas,
-          new faceapi.TinyFaceDetectorOptions()
+            canvas,
+            new faceapi.TinyFaceDetectorOptions()
         );
         console.log("얼굴 인식 결과:", detections);
 
@@ -152,9 +144,13 @@ export default {
     async analyze() {
       //TODO: debounce 적용 필요
       const resultPersonalColor = await this.analysisImage();
+      if (!resultPersonalColor) {
+        console.error("분석 결과가 없습니다.");
+        alert("분석 결과를 가져오는 데 실패했습니다. 다시 시도해주세요.");
+        return;
+      }
       console.log(resultPersonalColor);
       this.setPersonalColor(resultPersonalColor.data);
-      this.$router.push({ name: 'PcaResult' });
     },
     extractFace(canvas, faceBox) {
       try {
@@ -166,15 +162,15 @@ export default {
 
         const faceCtx = faceCanvas.getContext("2d");
         faceCtx.drawImage(
-          canvas,
-          faceBox.x,
-          faceBox.y,
-          faceBox.width,
-          faceBox.height,
-          0,
-          0,
-          faceBox.width,
-          faceBox.height
+            canvas,
+            faceBox.x,
+            faceBox.y,
+            faceBox.width,
+            faceBox.height,
+            0,
+            0,
+            faceBox.width,
+            faceBox.height
         );
 
         console.log("extractFace 완료");
@@ -202,7 +198,7 @@ export default {
       return new Promise((resolve, reject) => {
         if (this.file) {
           const reader = new FileReader();
-          
+
           reader.onload = (e) => {
             try {
               // Base64 데이터를 Blob으로 변환
@@ -264,5 +260,78 @@ export default {
       };
     },
   },
-};
+});
 </script>
+<style scoped>
+.camera-full {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: black;
+  overflow: hidden;
+}
+
+/* 카메라 영상 */
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(-1); /* 또는 아예 transform 속성 제거 */
+}
+
+/* 촬영된 이미지 */
+.overlay-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* 캡처 버튼 영역 */
+.camera-button-area {
+  position: absolute;
+  bottom: 40px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 10;
+}
+
+.shutter-button {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-color: white;
+  border: 4px solid #999;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.shutter-button:active {
+  transform: scale(0.9);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+}
+
+/* 얼굴 가이드 원 */
+.face-guide {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 60vw;
+  height: 60vw;
+  max-width: 300px;
+  max-height: 300px;
+  border: 2px dashed rgba(255, 255, 255, 0.6);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* 숨겨진 캔버스 */
+canvas.hidden-canvas {
+  display: none;
+}
+</style>
