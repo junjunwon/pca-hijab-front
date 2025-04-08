@@ -1,19 +1,26 @@
 <template>
   <MobileLayout>
-    <div class="camera-full">
+    <div class="camera-wrapper">
       <video ref="video" autoplay playsinline muted></video>
-      <!-- 얼굴 가이드 원 -->
+
+      <!-- 얼굴 가이드 -->
       <div class="face-guide" />
-      <!-- 캡처 버튼 (원형) -->
-      <div class="camera-button-area">
+
+      <!-- 텍스트 가이드 -->
+      <p class="capture-guide-text">
+        make sure your face fits <br />nicely in the circle!
+      </p>
+
+      <!-- 카메라 버튼 UI -->
+      <div class="camera-ui">
         <button class="shutter-button" @click="detectToPca" />
       </div>
-<!--      <v-img v-if=imageSrc :src="imageSrc" class="overlay-image" cover />-->
+
+      <!-- 캡처용 canvas -->
       <canvas ref="captureCanvas" class="hidden-canvas"></canvas>
     </div>
   </MobileLayout>
 </template>
-
 <script>
 import * as faceapi from "face-api.js";
 import { mapState, mapMutations, mapActions, mapGetters } from 'vuex';
@@ -262,76 +269,6 @@ export default defineComponent({
   },
 });
 </script>
-<style scoped>
-.camera-full {
-  position: relative;
-  width: 100vw;
-  height: 100vh;
-  background: black;
-  overflow: hidden;
-}
-
-/* 카메라 영상 */
-video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: scaleX(-1); /* 또는 아예 transform 속성 제거 */
-}
-
-/* 촬영된 이미지 */
-.overlay-image {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-/* 캡처 버튼 영역 */
-.camera-button-area {
-  position: absolute;
-  bottom: 40px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  z-index: 10;
-}
-
-.shutter-button {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  background-color: white;
-  border: 4px solid #999;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.6);
-  cursor: pointer;
-  transition: transform 0.1s ease, box-shadow 0.2s ease;
-}
-
-.shutter-button:active {
-  transform: scale(0.9);
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
-}
-
-/* 얼굴 가이드 원 */
-.face-guide {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 60vw;
-  height: 60vw;
-  max-width: 300px;
-  max-height: 300px;
-  border: 2px dashed rgba(255, 255, 255, 0.6);
-  border-radius: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 5;
-  pointer-events: none;
-}
-
-/* 숨겨진 캔버스 */
-canvas.hidden-canvas {
-  display: none;
-}
+<style scoped lang="scss">
+@import '@/assets/styles/face-capture.scss';
 </style>

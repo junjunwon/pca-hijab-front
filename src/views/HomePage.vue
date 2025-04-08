@@ -1,20 +1,49 @@
 <template>
   <MobileLayout>
-    <v-col class="text-center">
-      <h1 class="text-h5 font-weight-bold mb-4">Hi color</h1>
-      <v-img src="@/assets/hijab-introduction.svg" aspect-ratio="1.5" contain class="mb-4" />
-      <p class="mb-4">✨ Find Your Perfect Hijab Shade ✨</p>
-      <v-btn @click="goToPcaAnalysis" block class="mb-2" color="primary">Take a photo</v-btn>
-      <v-btn @click="triggerFileInput" block color="secondary">Upload photo</v-btn>
-      <!-- 숨겨진 input 태그 -->
-      <input
-          type="file"
-          accept="image/*"
-          ref="images"
-          @change="uploadToPcaAnalysis"
-          style="display: none"
-      />
-    </v-col>
+    <div class="intro-header">
+      <h1 class="headline">Find Your<br />Personal Color</h1>
+      <p class="subtext">Over 2.4 million people have found theirs</p>
+    </div>
+    <div class="intro-page">
+      <div class="prep-section">
+        <h2 class="prep-title">Quick prep<br />before we start</h2>
+
+        <ul class="prep-checklist">
+          <li>
+            <span class="icon blue-circle" /> Turn off blue light filters
+          </li>
+          <li>
+            <span class="icon light-bulb" /> Use natural or white lighting
+          </li>
+          <li>
+            <span class="icon sparkle" /> No makeup is best
+          </li>
+        </ul>
+
+        <div class="face-check">
+          <div class="face-item">
+            <v-img src="@/assets/hijab-introduction.svg" alt="full face visible" />
+            <span class="caption success">Good lighting, full face visible</span>
+          </div>
+          <div class="face-item">
+            <v-img src="@/assets/hijab-introduction.svg" alt="partly in shadow" />
+            <span class="caption error">Face is partly in shadow</span>
+          </div>
+          <div class="face-item">
+            <v-img src="@/assets/hijab-introduction.svg" alt="face covered" />
+            <span class="caption error">Face is mostly covered</span>
+          </div>
+        </div>
+      </div>
+      <div class="button-group">
+        <v-btn @click="goToPcaAnalysis" class="app-button-red" block rounded size="x-large">
+          <strong>I’m ready – Let’s go! 🪄</strong>
+        </v-btn>
+        <v-btn @click="triggerFileInput" class="app-button-red" block rounded size="x-large">
+          <strong>Upload photo</strong>
+        </v-btn>
+      </div>
+    </div>
   </MobileLayout>
 </template>
 
@@ -85,3 +114,119 @@ export default {
   }
 };
 </script>
+<style scoped lang="scss">
+@import '@/assets/styles/app-button.scss';
+
+.intro-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  gap: 32px;
+
+  .button-group {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px; // 버튼 사이 간격 줄이기
+  }
+}
+
+.intro-header {
+  background: linear-gradient(180deg, #f75a5f 0%, #f08e8e 100%);
+  color: white;
+  text-align: center;
+  padding: 40px 24px 32px;
+  border-bottom-left-radius: 32px;
+  border-bottom-right-radius: 32px;
+
+  .headline {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+
+  .subtext {
+    font-size: 16px;
+    font-weight: 400;
+    opacity: 0.9;
+  }
+}
+
+.prep-section {
+  background-color: #fff;
+  border-radius: 20px;
+  padding: 24px;
+  width: 100%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+
+  .prep-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+
+  .prep-checklist {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 16px 0;
+
+    li {
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+      margin-bottom: 12px;
+
+      .icon {
+        width: 20px;
+        height: 20px;
+        margin-right: 8px;
+        border-radius: 50%;
+
+        &.blue-circle {
+          background-color: #3b82f6;
+        }
+
+        &.light-bulb {
+          background-color: #fbbf24;
+        }
+
+        &.sparkle {
+          background-color: #fbcfe8;
+        }
+      }
+    }
+  }
+
+  .face-check {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    text-align: center;
+
+    .face-item {
+      flex: 1;
+
+      img {
+        width: 100%;
+        max-width: 80px;
+        margin: 0 auto 8px;
+      }
+
+      .caption {
+        font-size: 14px;
+        display: block;
+
+        &.success {
+          color: #16a34a;
+        }
+
+        &.error {
+          color: #dc2626;
+        }
+      }
+    }
+  }
+}
+</style>

@@ -1,0 +1,36 @@
+/* app-button.scss */
+.app-button-red {
+  font-weight: 600;
+  font-size: 16px;
+  padding: 16px;
+  background-color: #ff5757 !important;
+  color: white !important;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(255, 87, 87, 0.4);
+  transition: background-color 0.3s ease;
+  text-transform: none !important;
+  &:hover {
+    background-color: #e04a4a !important;
+  }
+}
+
+.icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  margin-right: 8px;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+
+.blue-circle {
+  background-color: #409eff;
+}
+
+.light-bulb {
+  background-color: #ffd700;
+}
+
+.sparkle {
+  background-color: #b266ff;
+}
