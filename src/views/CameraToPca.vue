@@ -80,14 +80,21 @@ export default defineComponent({
             this.isLoading = false;
           })
           .catch((error) => {
-            alert("Unable to capture your camera. Please check console logs.");
+            this.$alert("Unable to capture.", 'error');
             console.error(error);
           });
     },
     async detectToPca() {
-      await this.detectFace();
-      this.$router.push({ name: 'Loading' });
-      await this.analysisImage();
+      try {
+        await this.detectFace();
+        this.$router.push({ name: 'Loading' });
+        setTimeout(() => {
+          this.analysisImage();
+        }, 100);
+      } catch (err) {
+        // 얼굴 인식 실패 시 아무것도 안 함
+        console.warn("detectFace 실패, Loading으로 이동하지 않음");
+      }
     },
     async detectFace() {
       try {
@@ -98,8 +105,7 @@ export default defineComponent({
 
         if (!video.videoWidth || !video.videoHeight) {
           console.error("비디오 크기 확인 실패", { videoWidth: video.videoWidth, videoHeight: video.videoHeight });
-          alert("비디오가 준비되지 않았습니다. 다시 시도해주세요.");
-          return;
+          throw new Error('비디오가 준비되지 않았습니다. 다시 시도해주세요.');
         }
         console.log("비디오 크기 확인 완료");
 
@@ -119,8 +125,7 @@ export default defineComponent({
 
         if (!detections || detections.length === 0) {
           console.warn("얼굴을 인식하지 못함");
-          alert("얼굴을 인식하지 못했습니다. 얼굴을 화면 중앙에 맞추고 다시 시도해주세요.");
-          return;
+          throw new Error('얼굴 인식 실패');
         }
 
         const faceBox = {
@@ -143,7 +148,8 @@ export default defineComponent({
         })
       } catch (error) {
         console.error("전체 프로세스에서 오류 발생", error);
-        alert("분석 중 알 수 없는 오류가 발생했습니다. 다시 시도해주세요.");
+        this.$alert(error, 'error');
+        throw new Error(error);
       }
     },
     extractFace(canvas, faceBox) {

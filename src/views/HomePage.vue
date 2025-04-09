@@ -64,7 +64,7 @@ export default {
     ...mapMutations(['setDetectedImageSrc', 'setDetectedImage', 'setPersonalColor']),
     ...mapActions(['analysisImage']),
     async goToPcaAnalysis() {
-      alert('카메라 약관 작업 필요');
+      this.$alert('카메라 약관 작업 필요', 'info');
       this.$router.push({ name: 'CameraToPca' });
     },
     triggerFileInput() {

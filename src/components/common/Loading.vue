@@ -28,7 +28,6 @@
 <script>
 import { defineComponent } from 'vue';
 import { mapGetters } from 'vuex';
-
 export default defineComponent({
   name: 'Loading',
   data() {
@@ -47,7 +46,7 @@ export default defineComponent({
     this.timeout = setTimeout(() => {
       if (!responded) {
         this.clearTimers();
-        this.$dialog?.alert('10초 동안 응답이 없어 처음 화면으로 이동합니다.');
+        this.$alert('Timeout. Returning to start screen.', 'error');
         this.$router.push({ name: 'Home' });
       }
     }, 10000);
@@ -66,8 +65,8 @@ export default defineComponent({
       if (result.success) {
         this.$router.push({ name: 'PcaResult' });
       } else if (result.errorMsg) {
-        this.$dialog?.alert('분석 중 오류가 발생했습니다. 다시 시도해주세요.');
-        this.$router.push({ name: 'Home' });
+        this.$alert("Analysis failed. Try again.", 'error');
+        this.$router.push({ name: 'CameraToPca' });
       }
     }, 500);
   },

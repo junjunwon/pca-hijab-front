@@ -1,5 +1,5 @@
 const path = require('path');
-const { defineConfig } = require('@vue/cli-service')
+const { defineConfig } = require('@vue/cli-service');
 
 module.exports = defineConfig({
   transpileDependencies: true,
@@ -14,9 +14,26 @@ module.exports = defineConfig({
     }
   },
 
+  configureWebpack: {
+    module: {
+      rules: [
+        {
+          test: /\.ts$/,
+          exclude: [/node_modules/, /\.vue$/],
+          use: {
+            loader: 'ts-loader',
+            options: {
+              appendTsSuffixTo: [/\.vue$/]
+            }
+          },
+        }
+      ]
+    },
+  },
+
   pluginOptions: {
     vuetify: {
-			// https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vuetify-loader
-		}
+      // vuetify-loader 설정은 이대로 둬도 OK
+    }
   }
-})
+});

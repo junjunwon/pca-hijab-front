@@ -1,5 +1,9 @@
 module.exports = {
   presets: [
-    '@vue/cli-plugin-babel/preset'
+    '@babel/preset-env',
+    '@babel/preset-typescript'
+  ],
+  plugins: [
+    '@vue/babel-plugin-jsx' // JSX 안 쓰면 이거 빼도 됨
   ]
-}
+};
