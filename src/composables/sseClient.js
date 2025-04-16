@@ -1,8 +1,9 @@
 // sseClient.js
+const host = `${process.env.VUE_APP_API_BASE_URL}`;
 export function connectSSE(requestId, eventName, onMessage, onError) {
     return new Promise((resolve) => {
         console.log("SSE 연결 시도", requestId);
-        const source = new EventSource(`http://localhost:8090/api/sse/subscribe?requestId=${requestId}`);
+        const source = new EventSource(`${host}/api/sse/subscribe?requestId=${requestId}`);
 
         source.addEventListener(eventName, (event) => {
             try {

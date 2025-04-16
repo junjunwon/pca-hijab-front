@@ -39,9 +39,9 @@
         <v-btn @click="goToPcaAnalysis" class="app-button-red" block rounded size="x-large">
           <strong>I’m ready – Let’s go! 🪄</strong>
         </v-btn>
-<!--        <v-btn @click="triggerFileInput" class="app-button-red" block rounded size="x-large">-->
-<!--          <strong>Upload photo</strong>-->
-<!--        </v-btn>-->
+        <v-btn @click="triggerFileInput" class="app-button-red" block rounded size="x-large">
+          <strong>Upload photo</strong>
+        </v-btn>
       </div>
     </div>
   </MobileLayout>
@@ -51,7 +51,7 @@
 import { mapMutations, mapActions } from 'vuex';
 import validateMixin from '@/mixins/validateMixin.js';
 
-import { useRequestId } from '@/composables/cookie';
+import { useRequestId } from '@/composables/localStorage';
 const { ensureRequestId, getRequestId } = useRequestId();
 
 export default {
@@ -69,10 +69,11 @@ export default {
     ...mapMutations(['setDetectedImageSrc', 'setDetectedImage', 'setPersonalColor']),
     ...mapActions(['analysisImage']),
     async goToPcaAnalysis() {
-      this.$alert('카메라 약관 작업 필요', 'info');
+      // this.$alert('카메라 약관 작업 필요', 'info');
       this.$router.push({ name: 'CameraToPca' });
     },
     triggerFileInput() {
+      this.$alert('Service coming soon', 'info');
       this.$refs.images.click();
     },
     async uploadToPcaAnalysis() {

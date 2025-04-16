@@ -199,7 +199,8 @@ export default defineComponent({
 }
 
 .product-name {
-  font-size: 11px;
+  font-size: 14px;
+  font-weight: bold;
   line-height: 1.2;
   text-align: center;
   margin-top: 4px;

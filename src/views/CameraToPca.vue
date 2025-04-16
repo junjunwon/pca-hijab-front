@@ -26,7 +26,7 @@ import * as faceapi from "face-api.js";
 import { mapState, mapMutations, mapActions, mapGetters } from 'vuex';
 // import Loading from '../common/Loading.vue';
 import { defineComponent } from 'vue';
-import { useRequestId } from '@/composables/cookie';
+import { useRequestId } from '@/composables/localStorage';
 import {connectSSE} from "@/composables/sseClient";
 const { getRequestId } = useRequestId();
 
@@ -97,7 +97,7 @@ export default defineComponent({
         if (success === 200) {
           this.$router.push({ name: 'Loading' });
         } else {
-          this.$alert('분석 요청 실패. 다시 시도해주세요.', 'error');
+          this.$alert('Analysis request failed. Please try again.', 'error');
         }
       } catch (err) {
         console.warn("detectFace 실패, Loading으로 이동하지 않음");
@@ -106,19 +106,18 @@ export default defineComponent({
     async connectToServer() {
       const requestId = getRequestId();
       this.setRequestId(requestId);
-      console.log('Loading - Request ID:', requestId);
       if (!requestId) {
-        this.$alert('Request ID가 없습니다. 홈으로 이동합니다.', 'warning');
+        this.$alert('Request ID is missing. Redirecting to the home page.', 'warning');
         this.$router.push({ name: 'Home' });
         return;
       }
 
-      // 60초 타임아웃 설정
-      this.timeout = setTimeout(() => {
-        this.clearResources();
-        this.$alert('Timeout. 다시 시작합니다.', 'error');
-        this.$router.push({ name: 'Home' });
-      }, 60000);
+      // // 60초 타임아웃 설정
+      // this.timeout = setTimeout(() => {
+      //   this.clearResources();
+      //   this.$alert('Timeout. Restart', 'error');
+      //   this.$router.push({ name: 'Home' });
+      // }, 60000);
 
       // SSE 연결 시작
       console.log('Loading - connectSSE 시작');
@@ -131,13 +130,13 @@ export default defineComponent({
               this.setPersonalColor(data);
               this.$router.push({ name: 'PcaResult' });
             } else {
-              this.$alert(data.errorMsg || '분석 실패. 다시 시도해 주세요.', 'error');
+              this.$alert(data.errorMsg || 'Analysis failed. Please try again.', 'error');
               this.$router.push({ name: 'CameraToPca' });
             }
           },
           () => {
             this.clearResources();
-            this.$alert('서버 연결 오류. 다시 시도해 주세요.', 'error');
+            this.$alert('Server connection error. Please try again.', 'error');
             this.$router.push({ name: 'Home' });
           }
       );
