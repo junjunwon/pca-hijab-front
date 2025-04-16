@@ -1,7 +1,7 @@
 <template>
   <MobileLayout>
     <div class="intro-header">
-      <h1 class="headline">Find Your<br />Personal Color</h1>
+      <h1 class="headline">Find your<br />Best color Hijab</h1>
       <p class="subtext">Over 2.4 million people have found theirs</p>
     </div>
     <div class="intro-page">
@@ -22,15 +22,15 @@
 
         <div class="face-check">
           <div class="face-item">
-            <v-img src="@/assets/hijab-temp2.png" alt="full face visible" />
+            <v-img src="@/assets/hijab-check1.png" alt="full face visible" />
             <span class="caption success">Good lighting,<br />full face visible</span>
           </div>
           <div class="face-item">
-            <v-img src="@/assets/hijab-temp2.png" alt="partly in shadow" />
+            <v-img src="@/assets/hijab-check2.png" alt="partly in shadow" />
             <span class="caption error">Face is partly<br />in shadow</span>
           </div>
           <div class="face-item">
-            <v-img src="@/assets/hijab-temp2.png" alt="face covered" />
+            <v-img src="@/assets/hijab-check3.png" alt="face covered" />
             <span class="caption error">Face is mostly<br />covered</span>
           </div>
         </div>
@@ -39,9 +39,9 @@
         <v-btn @click="goToPcaAnalysis" class="app-button-red" block rounded size="x-large">
           <strong>I’m ready – Let’s go! 🪄</strong>
         </v-btn>
-        <v-btn @click="triggerFileInput" class="app-button-red" block rounded size="x-large">
-          <strong>Upload photo</strong>
-        </v-btn>
+<!--        <v-btn @click="triggerFileInput" class="app-button-red" block rounded size="x-large">-->
+<!--          <strong>Upload photo</strong>-->
+<!--        </v-btn>-->
       </div>
     </div>
   </MobileLayout>

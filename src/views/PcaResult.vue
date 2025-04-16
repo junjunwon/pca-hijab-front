@@ -43,12 +43,15 @@
               cols="4"
               class="pa-1"
           >
-            <v-card class="rounded-lg overflow-hidden" flat>
-              <v-img
-                  :src="item.image"
-                  height="100"
-                  cover
-              />
+            <v-card
+                class="rounded-lg overflow-hidden"
+                flat
+                :elevation="0"
+                @click="selectedItem = item.name"
+            >
+              <div :class="{ 'selected-border': selectedItem === item.name }">
+                <v-img :src="item.image" height="130" cover />
+              </div>
               <div class="product-name">{{ item.name }}</div>
             </v-card>
           </v-col>
@@ -78,12 +81,13 @@ export default defineComponent({
         '#D8B4A0', '#B89C8E', '#ECC1A1'
       ],
       products: [
-        { name: 'Peach Hijab', image: require('@/assets/hijab-temp.svg') },
-        { name: 'Beige Classic', image: require('@/assets/hijab-temp.svg') },
-        { name: 'Autumn Mood', image: require('@/assets/hijab-temp.svg') },
+        { name: 'NAJWA', image: require('@/assets/hijab-result1.png'), url: 'https://hareer.com.pk/products/najwa-chiffon-hijab' },
+        { name: 'LEENA', image: require('@/assets/hijab-result2.png'), url: 'https://hareer.com.pk/products/leena-chiffon-hijab-1' },
+        { name: 'ORCHID', image: require('@/assets/hijab-result3.png'), url: 'https://hareer.com.pk/products/orchid-chiffon-hijab' },
       ],
       personalColor: {},
       resultImageSrc: '',
+      selectedItem: null,
     };
   },
   async mounted() {
@@ -92,12 +96,20 @@ export default defineComponent({
   },
   computed: {
     ...mapGetters(['getUser']),
+    isSelected() {
+      return this.selectedItem === this.item.name;
+    }
   },
   methods: {
     ...mapMutations(['resetPca']),
     ...mapActions(['']),
     redirectToBrand() {
-      window.open('https://shopee.co.id/Hijab-cat.11042684.11042685', '_blank');
+      const selected = this.products.find(p => p.name === this.selectedItem);
+      if (selected && selected.url) {
+        window.open(selected.url, '_blank');
+      } else {
+        window.open('https://hareer.com.pk/products/najwa-chiffon-hijab', '_blank');
+      }
     },
     restartPca() {
       this.resetPca();
@@ -196,5 +208,10 @@ export default defineComponent({
 
 .product-list {
   margin-bottom: 24px;
+}
+
+.selected-border {
+  border: 5px solid #ff5757;
+  box-sizing: border-box;
 }
 </style>
