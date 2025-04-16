@@ -27,66 +27,22 @@
 
 <script>
 import { defineComponent } from 'vue';
-import { mapGetters } from 'vuex';
+
 export default defineComponent({
   name: 'Loading',
   data() {
     return {
-      polling: null,
-      timeout: null,
     };
   },
-  computed: {
-    ...mapGetters(['getPcaResult']),
-  },
   mounted() {
-    let responded = false;
-
-    // 10초 타임아웃 설정
-    this.timeout = setTimeout(() => {
-      if (!responded) {
-        this.clearTimers();
-        this.$alert('Timeout. Returning to start screen.', 'error');
-        this.$router.push({ name: 'Home' });
-      }
-    }, 10000);
-
-    // 0.5초 간격 polling
-    this.polling = setInterval(() => {
-      const result = this.getPcaResult;
-
-      if (!result) {
-        return;
-      }
-
-      responded = true;
-      this.clearTimers();
-
-      if (result.success) {
-        this.$router.push({ name: 'PcaResult' });
-      } else if (result.errorMsg) {
-        this.$alert("Analysis failed. Try again.", 'error');
-        this.$router.push({ name: 'CameraToPca' });
-      }
-    }, 500);
   },
   beforeUnmount() {
-    this.clearTimers();
   },
   methods: {
-    clearTimers() {
-      if (this.polling) {
-        clearInterval(this.polling);
-        this.polling = null;
-      }
-      if (this.timeout) {
-        clearTimeout(this.timeout);
-        this.timeout = null;
-      }
-    },
   },
 });
 </script>
+
 <style scoped>
 .loading-container {
   height: 100vh;

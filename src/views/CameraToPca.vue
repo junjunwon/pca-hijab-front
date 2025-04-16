@@ -26,6 +26,9 @@ import * as faceapi from "face-api.js";
 import { mapState, mapMutations, mapActions, mapGetters } from 'vuex';
 // import Loading from '../common/Loading.vue';
 import { defineComponent } from 'vue';
+import { useRequestId } from '@/composables/cookie';
+import {connectSSE} from "@/composables/sseClient";
+const { getRequestId } = useRequestId();
 
 export default defineComponent({
   components: {
@@ -38,7 +41,8 @@ export default defineComponent({
       image: new Image(),
       imageSrc: '',
       file: '',
-
+      sseSource: null,
+      timeout: null,
     };
   },
   computed: {
@@ -51,9 +55,10 @@ export default defineComponent({
     this.isLoading = true;
     this.loadFaceApiModels();
     this.startRec();
+    this.connectToServer();
   },
   methods: {
-    ...mapMutations(['setDetectedImage', 'setPersonalColor', 'setDetectedImageSrc']),
+    ...mapMutations(['setDetectedImage', 'setPersonalColor', 'setDetectedImageSrc', 'setRequestId']),
     ...mapActions(['analysisImage']),
     async loadFaceApiModels() {
       await faceapi.nets.tinyFaceDetector.loadFromUri("/models");
@@ -85,15 +90,68 @@ export default defineComponent({
           });
     },
     async detectToPca() {
+      await this.detectFace();
       try {
-        await this.detectFace();
-        this.$router.push({ name: 'Loading' });
-        setTimeout(() => {
-          this.analysisImage();
-        }, 100);
+        const success = await this.analysisImage();
+        console.log("분석 결과:", success);
+        if (success === 200) {
+          this.$router.push({ name: 'Loading' });
+        } else {
+          this.$alert('분석 요청 실패. 다시 시도해주세요.', 'error');
+        }
       } catch (err) {
-        // 얼굴 인식 실패 시 아무것도 안 함
         console.warn("detectFace 실패, Loading으로 이동하지 않음");
+      }
+    },
+    async connectToServer() {
+      const requestId = getRequestId();
+      this.setRequestId(requestId);
+      console.log('Loading - Request ID:', requestId);
+      if (!requestId) {
+        this.$alert('Request ID가 없습니다. 홈으로 이동합니다.', 'warning');
+        this.$router.push({ name: 'Home' });
+        return;
+      }
+
+      // 60초 타임아웃 설정
+      this.timeout = setTimeout(() => {
+        this.clearResources();
+        this.$alert('Timeout. 다시 시작합니다.', 'error');
+        this.$router.push({ name: 'Home' });
+      }, 60000);
+
+      // SSE 연결 시작
+      console.log('Loading - connectSSE 시작');
+      this.sseSource = await connectSSE(
+          requestId,
+          'COLOR_ANALYSIS',
+          (data) => {
+            console.log('after connectSSE is ', data);
+            if (data.success) {
+              this.setPersonalColor(data);
+              this.$router.push({ name: 'PcaResult' });
+            } else {
+              this.$alert(data.errorMsg || '분석 실패. 다시 시도해 주세요.', 'error');
+              this.$router.push({ name: 'CameraToPca' });
+            }
+          },
+          () => {
+            this.clearResources();
+            this.$alert('서버 연결 오류. 다시 시도해 주세요.', 'error');
+            this.$router.push({ name: 'Home' });
+          }
+      );
+      console.log("sseSource 타입", this.sseSource);
+    },
+    clearResources() {
+      if (this.sseSource instanceof EventSource) {
+        this.sseSource.close();
+      }
+      this.sseSource = null;
+
+      if (this.timeout) {
+        clearTimeout(this.timeout);
+        this.timeout = null;
       }
     },
     async detectFace() {
@@ -136,23 +194,28 @@ export default defineComponent({
         };
         console.log("첫 번째 얼굴 박스:", faceBox);
 
-        const faceCanvas = this.extractFace(canvas, faceBox);
+        const faceCanvas = await this.extractFace(canvas, faceBox);
         console.log("faceCanvas 크기:", faceCanvas.width, faceCanvas.height);
 
         // faceCanvas를 이미지로 변환
         this.imageSrc = faceCanvas.toDataURL();
         this.setDetectedImageSrc(this.imageSrc);
-        // faceCanvas를 Blob으로 변환
-        faceCanvas.toBlob((blob) => {
-          this.setDetectedImage(blob);
-        })
+
+        // faceCanvas를 Blob으로 변환하고, 그 Blob을 다 처리한 후에야 다음 단계로 넘어가기
+        const blob = await new Promise((resolve, reject) => {
+          faceCanvas.toBlob((blob) => {
+            if (blob) resolve(blob);
+            else reject('Blob 변환 실패');
+          });
+        });
+        this.setDetectedImage(blob); // Blob 준비 완료 후에 호출
       } catch (error) {
         console.error("전체 프로세스에서 오류 발생", error);
         this.$alert(error, 'error');
         throw new Error(error);
       }
     },
-    extractFace(canvas, faceBox) {
+    async extractFace(canvas, faceBox) {
       try {
         console.log("extractFace 시작:", faceBox);
 
@@ -229,7 +292,7 @@ export default defineComponent({
     },
     startWebSocket() {
       const socket = new WebSocket("ws://172.23.19.84:3000/ws");  // WebSocket 연결 시도
-      const timeoutDuration = 5000;  // 5초 타임아웃 설정 (필요 시 조정)
+      const timeoutDuration = 50000;  // 5초 타임아웃 설정 (필요 시 조정)
 
       // 타임아웃 처리
       const timeout = setTimeout(() => {

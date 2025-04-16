@@ -5,6 +5,8 @@ import store from './store'
 import vuetify from './plugins/vuetify'
 import { loadFonts } from './plugins/webfontloader'
 import { alertShow } from '@/composables/useAlertStore';
+import VueCookies from 'vue3-cookies';
+
 
 loadFonts()
 const app = createApp(App);
@@ -17,4 +19,5 @@ app
   .use(router)
   .use(store)
   .use(vuetify)
+  .use(VueCookies)
   .mount('#app')

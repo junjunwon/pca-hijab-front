@@ -14,8 +14,8 @@ const store = createStore({
       pcaResult: {
         success: false,
         errorMsg: '',
-      }
-      
+      },
+      requestId: '',
     }
   },
   getters: {
@@ -52,6 +52,9 @@ const store = createStore({
       state.user.pcaResult.success = pcaResult.success;
       state.user.pcaResult.errorMsg = pcaResult.errorMsg;
     },
+    setRequestId(state, requestId) {
+        state.user.requestId = requestId;
+    }
   },
   actions: {
     async analysisImage({ state }) {
@@ -64,18 +67,33 @@ const store = createStore({
           throw new Error("이미지 Blob이 유효하지 않습니다.");
         }
         formData.append("image", state.user.detectedImageBlob, "face-image.png");
+        formData.append("requestId", state.user.requestId);
         const response = await axios.post('/color/analysis', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           }
         });
-        this.commit('setPcaResult', { success: true, errorMsg: '' });
-        this.commit('setPersonalColor', response.data);
+        // this.commit('setPcaResult', { success: true, errorMsg: '' });
+        // this.commit('setPersonalColor', response.data);
+        return response.status;
       } catch (error) {
         console.error('Error analysisImage:', error);
-        this.commit('setPcaResult', { success: false, errorMsg: 'Error occurred during analysis.' });
+        throw error;
+        // this.commit('setPcaResult', { success: false, errorMsg: 'Error occurred during analysis.' });
       }
     },
+    async unSubscribe({ state }) {
+      try {
+        const response = await axios.delete('/sse/unsubscribe', {
+          params: {
+            requestId: state.user.requestId
+          }
+        });
+        console.log('Unsubscribe response:', response);
+      } catch (error) {
+        console.error('Error during unsubscribe:', error);
+      }
+    }
   },
   plugins: [createPersistedState({
     storage: window.localStorage,

@@ -51,6 +51,9 @@
 import { mapMutations, mapActions } from 'vuex';
 import validateMixin from '@/mixins/validateMixin.js';
 
+import { useRequestId } from '@/composables/cookie';
+const { ensureRequestId, getRequestId } = useRequestId();
+
 export default {
   mixins: [validateMixin],
   name: 'HomePage',
@@ -59,6 +62,8 @@ export default {
     }
   },
   mounted() {
+    ensureRequestId();
+    console.log('mounted is ', getRequestId());
   },
   methods: {
     ...mapMutations(['setDetectedImageSrc', 'setDetectedImage', 'setPersonalColor']),
