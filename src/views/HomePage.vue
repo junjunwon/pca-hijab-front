@@ -22,15 +22,15 @@
 
         <div class="face-check">
           <div class="face-item">
-            <v-img src="@/assets/hijab-check1.png" alt="full face visible" />
+            <v-img src="@/assets/hijab-check1.webp" alt="full face visible" />
             <span class="caption success">Good lighting,<br />full face visible</span>
           </div>
           <div class="face-item">
-            <v-img src="@/assets/hijab-check2.png" alt="partly in shadow" />
+            <v-img src="@/assets/hijab-check2.webp" alt="partly in shadow" />
             <span class="caption error">Face is partly<br />in shadow</span>
           </div>
           <div class="face-item">
-            <v-img src="@/assets/hijab-check3.png" alt="face covered" />
+            <v-img src="@/assets/hijab-check3.webp" alt="face covered" />
             <span class="caption error">Face is mostly<br />covered</span>
           </div>
         </div>

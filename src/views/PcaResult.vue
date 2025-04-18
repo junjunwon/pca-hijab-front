@@ -81,9 +81,9 @@ export default defineComponent({
         '#D8B4A0', '#B89C8E', '#ECC1A1'
       ],
       products: [
-        { name: 'NAJWA', image: require('@/assets/hijab-result1.png'), url: 'https://hareer.com.pk/products/najwa-chiffon-hijab' },
-        { name: 'LEENA', image: require('@/assets/hijab-result2.png'), url: 'https://hareer.com.pk/products/leena-chiffon-hijab-1' },
-        { name: 'ORCHID', image: require('@/assets/hijab-result3.png'), url: 'https://hareer.com.pk/products/orchid-chiffon-hijab' },
+        { name: 'NAJWA', image: require('@/assets/hijab-result1.webp'), url: 'https://hareer.com.pk/products/najwa-chiffon-hijab' },
+        { name: 'LEENA', image: require('@/assets/hijab-result2.webp'), url: 'https://hareer.com.pk/products/leena-chiffon-hijab-1' },
+        { name: 'ORCHID', image: require('@/assets/hijab-result3.webp'), url: 'https://hareer.com.pk/products/orchid-chiffon-hijab' },
       ],
       personalColor: {},
       resultImageSrc: '',
