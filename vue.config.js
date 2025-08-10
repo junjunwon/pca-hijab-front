@@ -10,6 +10,8 @@ module.exports = defineConfig({
     proxy: {
       '/api': {
         target: process.env.VUE_APP_API_BASE_URL,
+        changeOrigin: true,  // 도메인 변경 허용
+        withCredentials: true, // 쿠키 포함 요청
       },
     }
   },
